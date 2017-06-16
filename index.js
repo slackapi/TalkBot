@@ -10,6 +10,7 @@ const bodyParser = require('body-parser');
 const WebClient = require('@slack/client').WebClient;
 const createSlackEventAdapter = require('@slack/events-api').createSlackEventAdapter;
 var twilio = require('twilio');
+var firebase = require('firebase');
 
 
 /**
@@ -38,12 +39,30 @@ app.use(bodyParser.json());
 // Slack web client
 const web = new WebClient(auth_token);
 const bot = new WebClient(bot_token);
+// Firebase configuration
+const config = {
+	apiKey: process.env.FB_API_KEY || '',
+	authDomain: process.env.FB_AUTH_DOMAIN || '',
+	databaseURL: process.env.FB_DB_URL || '',
+	projectId: process.env.FB_PROJECT_ID || '',
+	storageBucket: process.env.FB_STORAGE_BUCKET || '',
+	messagingSenderId: process.env.FB_MESSAGING_SENDER_ID || ''
+};
+// Firebase initialization
+const db = firebase.initializeApp(config).database();
 
+
+/**
+ * App Variables
+ * Channel ID, Bot User ID, Port
+ */
+
+// Holds channel ID
+let channel = '#general'
+// Holds bot user ID
+let botID;
 // The port we'll be using for our Express server
 const PORT = 4390;
-
-// The channel we'll send TalkBot messages to
-const channel = '#general'
 
 // Starts our server
 app.listen(PORT, function() {
@@ -57,8 +76,15 @@ app.post('/sms', function(req, res) {
 	// Gets phone number from sender without leading plus sign
 	let num = req.body.From ? req.body.From.slice(1) : '';
 
-	// Sends message to Slack - in format <msg> from <phone number>
-	sendMessage(msg + ' from ' + num, channel, num);
+	getID(num)
+		.then((id) => {
+			if (id) {  // User exists in database
+				sendThread(msg, channel, id);
+			} else { // User doesn't exist -- send message and create user
+				sendMessage(msg, channel, num);
+			}	
+		})
+		.catch(console.error);
 });
 
 function sendMessage(text, channel, num) {
@@ -66,6 +92,66 @@ function sendMessage(text, channel, num) {
 	web.chat.postMessage(channel, text, function(err, info) {
 		if (err) {
 			console.log(err);
+		} else {
+			if (num) {
+				// Create user in database
+				createUser(num, info.ts);
+			}
 		}
+	});
+}
+
+function sendThread(text, channel, id) {
+	// Send message using Slack Web Client
+	var msg = {
+		thread_ts: id
+	};
+
+	web.chat.postMessage(channel, text, msg, function(err, info) {
+		if (err) console.log(err);
+	});
+}
+
+
+/**
+ * Firebase Access Methods:
+ * Channel manipulation, user manipulation, and user retrieval
+ */
+
+// Update channel
+function updateChannel(id) {
+	db.ref('channel/id').set(id);
+}
+
+// Get channel
+function getChannel() {
+	const ref = db.ref('channel/id');
+	ref.on('value', (snapshot) => {
+		channel = snapshot.val();
+	})
+}
+
+// Create user in Firebase
+function createUser(num, id) {
+	db.ref('users/' + num).set(id);
+}
+
+// Delete user in Firebase
+function deleteUser(num) {
+	db.ref('users/').child(num).remove();
+}
+
+// Get number from message ID in Firebase
+function getNum(id) {
+	return db.ref('users/').orderByValue().equalTo(id).once('value').then((snapshot) => {
+		if (snapshot.val()) return Object.keys(snapshot.val())[0];
+		return null;
+	});
+}
+
+// Get thread ID from phone number in Firebase
+function getID(num) {
+	return db.ref('users/').child(num).once('value').then((snapshot) => {
+		return snapshot.val();
 	});
 }
