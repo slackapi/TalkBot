@@ -52,7 +52,7 @@ Now, we can add a new event listener to check for messages with the `@talkbot <m
 ```js
 slackEvents.on('message', (event) => {
 	let trigger = '<@' + botID + '>';
-	if (event.thread_ts && (event.channel == channel) && event.text.startsWith(trigger)) {
+	if (event.thread_ts && event.text.startsWith(trigger)) {
 		// Send message
 	}
 });
@@ -110,7 +110,7 @@ Finally, going back to our message listener, we'll call `sendSMS()` in our `if` 
 ```js
 slackEvents.on('message', (event) => {
 	let trigger = '<@' + botID + '>';
-	if (event.thread_ts && (event.channel == channel) && event.text.startsWith(trigger)) {
+	if (event.thread_ts && event.text.startsWith(trigger)) {
 		let msg = event.text.replace(trigger, '');
 		sendSMS(msg, event.thread_ts);
 	}
