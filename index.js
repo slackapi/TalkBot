@@ -83,6 +83,9 @@ app.listen(PORT, function() {
 			}
 		})
 		.catch(console.error)
+
+	// Update channel
+	getChannel();
 });
 
 
@@ -126,6 +129,26 @@ app.post('/sms', function(req, res) {
 		.catch(console.error);
 });
 
+app.post('/select', function(req, res) {
+	let body = JSON.parse(req.body.payload);
+	let id = body.actions[0].selected_options[0].value;
+	res.json({text: 'Great, I\'ll send incoming messages there', replace_original: false});
+
+	// Update Channel
+	updateChannel(id);
+});
+
+app.get('/auth', function(req, res) {
+	web.oauth.access(process.env.SLACK_CLIENT_ID, process.env.SLACK_CLIENT_SECRET, req.query.code, function(err, info) {
+		if (err) console.log(err);
+		if (!err) {
+			initBot(info.user_id);
+
+			res.redirect('http://slack.com');
+		}
+	});
+});
+
 function sendSMS(msg, id) { 
 	getNum(id)
 		.then((num) => {
@@ -166,6 +189,38 @@ function sendThread(text, channel, id) {
 	});
 }
 
+function initBot(id) {
+	// Open IM
+	web.im.open(id, function(err, info) {
+		if (err) console.log(err);
+
+		installConfig(info.channel.id);
+	});
+}
+
+function installConfig(id) {
+	let text = 'Hey there! I\'m TalkBot, a Slack bot you can use to send and receive messages from Twilio. Pick which channel you want me to send messages to. After you select the channel, make sure to invite me using the command `/invite @talkbot` in your selected channel.';
+	let msg = {
+		response_type: 'in_channel',
+		attachments: [{
+			fallback: 'Upgrade your Slack client to use messages like these.',
+			color: '#ed2e3b',
+			attachment_type: 'default',
+			callback_id: 'simple_select',
+			actions: [{
+				name: 'channels_list',
+				text: 'Which channel should I post to?',
+				type: 'select',
+				data_source: 'channels'
+			}]
+		}]
+	};
+
+	// Send initial IM to user
+	web.chat.postMessage(id, text, msg, function(err, info) {
+		if (err) console.log(err);
+	});
+}
 
 /**
  * Firebase Access Methods:
