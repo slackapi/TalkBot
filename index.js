@@ -24,6 +24,9 @@ const bot_token = process.env.SLACK_BOT_TOKEN || '';
 const auth_token = process.env.SLACK_AUTH_TOKEN || '';
 // Verification token for Events Adapter
 const slackEvents = createSlackEventAdapter(process.env.SLACK_VERIFICATION_TOKEN);
+// Twilio client authorization
+const twilio_sid = process.env.TWILIO_SID || '';
+const twilio_auth = process.env.TWILIO_AUTH_TOKEN || '';
 
 
 /**
@@ -52,6 +55,8 @@ const config = {
 };
 // Firebase initialization
 const db = firebase.initializeApp(config).database();
+// Initialize Twilio client using our Twilio SID and Authorization token
+const twilioClient = twilio(twilio_sid, twilio_auth);
 
 
 /**
@@ -69,6 +74,15 @@ const PORT = 4390;
 // Starts our server
 app.listen(PORT, function() {
 	console.log('TalkBot is listening on port ' + PORT);
+
+	// Get userID for bot
+	bot.auth.test()
+		.then((info) => {
+			if (info.user_id) {
+				botID = info.user_id;
+			}
+		})
+		.catch(console.error)
 });
 
 
@@ -83,6 +97,14 @@ slackEvents.on('reaction_added', (event) => {
 		getNum(event.item.ts)
 			.then((num) => {deleteUser(num)})
 			.catch(console.error);
+	}
+});
+
+slackEvents.on('message', (event) => {
+	let trigger = '<@' + botID + '>';
+	if (event.thread_ts && event.text.startsWith(trigger)) {
+		let msg = event.text.replace(trigger, '');
+		sendSMS(msg, event.thread_ts);
 	}
 });
 
@@ -103,6 +125,21 @@ app.post('/sms', function(req, res) {
 		})
 		.catch(console.error);
 });
+
+function sendSMS(msg, id) { 
+	getNum(id)
+		.then((num) => {
+			if (num) {
+				twilioClient.messages.create({
+					to: num,
+					// from: your Twilio phone number
+					from: '+14155555555',
+					body: msg
+				});
+			}
+		})
+		.catch(console.error)
+}
 
 function sendMessage(text, channel, num) {
 	// Send message using Slack Web Client
