@@ -6,11 +6,11 @@
 require('dotenv').config();
 
 const express = require('express');
+const firebase = require('firebase');
+const twilio = require('twilio');
 const bodyParser = require('body-parser');
 const WebClient = require('@slack/client').WebClient;
 const createSlackEventAdapter = require('@slack/events-api').createSlackEventAdapter;
-var twilio = require('twilio');
-var firebase = require('firebase');
 
 
 /**
@@ -36,6 +36,8 @@ const app = express();
 // Use BodyParser for app
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+// Slack events client
+app.use('/events', slackEvents.expressMiddleware());
 // Slack web client
 const web = new WebClient(auth_token);
 const bot = new WebClient(bot_token);
@@ -67,6 +69,21 @@ const PORT = 4390;
 // Starts our server
 app.listen(PORT, function() {
 	console.log('TalkBot is listening on port ' + PORT);
+});
+
+
+/**
+ * Slack Event Listeners
+ * Reaction added and message receieved
+ */
+
+slackEvents.on('reaction_added', (event) => {
+	// Check for white check mark emoji
+	if (event.reaction == 'white_check_mark') {
+		getNum(event.item.ts)
+			.then((num) => {deleteUser(num)})
+			.catch(console.error);
+	}
 });
 
 // Handles incoming SMS to Twilio number
