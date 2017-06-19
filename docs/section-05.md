@@ -8,7 +8,7 @@
 * **Section 05: Responding to SMS via Slack** 👈
 * [Section 06: Adding Onboarding and Message Menus](section-06.md)
 
-In the [last section](section-04.md), we added user deletion on emoji reaction. Next, we're going to add is the ability to send SMS messages back to the user using a trigger `@talkbot <msg>` in an existing, active thread. We're going to achieve this by again using *event triggers*.
+In [Section 04](section-04.md), we added user deletion on emoji reaction. Next, we're going to add is the ability to send SMS messages back to the user using a trigger `@talkbot <msg>` in an existing, active thread. We're going to achieve this by again using *event triggers*.
 
 ## Setting up Message Listener
 First, just like we did for listening with reactions, we need to set up an event listener for all messages. Go to [Your Slack Apps](https://api.slack.com/apps). Click on your app, then on the left sidebar, go to `Event Subscriptions` (under Features).
@@ -122,7 +122,7 @@ Now, you should be able to send SMS via Slack after the phone number is added to
 ![SMS using Slack](img/sms-via-slack.gif)
 
 # Adding Message Menus and Distributing
-Overall, our app is able to be used now. If you aren't interested in configuring OAuth for distribution or adding the ability for someone to pick a channel, you're done! 🎉
+Overall, our app is functional now. If you aren't interested in configuring OAuth for distribution or adding the ability for a default channel picker, you're done! 🎉
 
 For everyone else...the last thing we'll do is set up the application for distribution. This involves setting up OAuth and prompting the installer via DM and message menus to configure TalkBot for their team.
 

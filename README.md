@@ -8,7 +8,7 @@ Let's get started! 🎉👩‍💻
 
 ### This tutorial will cover:
 * Setting up a Slack application and bot user, then installing it onto your team
-* Using Twilio to receive SMS and send via your Slack app
+* Using Twilio to send and receive SMS from your Slack app
 * Integrating Firebase and threads to organize conversations across SMS and Slack
 * Listening for and responding to Slack events
 
@@ -31,7 +31,7 @@ This tutorial is split up into 6 different sections. If you get stuck on any sec
 * [Section 03: Adding Threads to Your Conversations](docs/section-03.md)
 * [Section 04: Responding to Message Events](docs/section-04.md)
 * [Section 05: Responding to SMS via Slack](docs/section-05.md)
-* [Section 06: Adding OAuth Configuration](docs/section-05.md)
+* [Section 06: Adding OAuth Configuration](docs/section-06.md)
 
 ## Getting Help
 

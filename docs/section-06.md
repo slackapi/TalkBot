@@ -8,7 +8,7 @@
 * [Section 05: Responding to SMS via Slack](section-05.md)
 * **Section 06: Adding Onboarding and Message Menus** 👈
 
-Although not necessary for functionality, we're going to finish TalkBot by adding message menus to prompt the user for a default channel, and configure OAuth for app installation. To start, let's set up an Auth Redirect URL and set up an Add to Slack button for our app.
+In [Section 05](section-05.md), we added the ability to respond with SMS from within Slack. Although not necessary for functionality, we're going to finish TalkBot by adding message menus to prompt the user for a default channel, and configure OAuth for app installation. To start, let's set up an Auth Redirect URL and set up an Add to Slack button for our app.
 
 ## Adding OAuth
 To start, go to [Your Slack Apps](https://api.slack.com/apps). Click on your app, then on the left sidebar, click `OAuth & Permissions`. Add a redirect URL with your Ngrok server at a `/auth` endpoint. For me, it'd be:
@@ -147,7 +147,7 @@ If you select a channel from the drop down, you'll be able to see a channel ID a
 # Conclusion
 Over 6 sections, we've created a Slack bot that listens to and responds to SMS messages using the Twilio SDK. We've learned how to utilize the Events and Web APIs, include Firebase and Twilio in our Slack applications, and utilize event listeners to add threads and interactivity to our bot. Naturally, what we covered was pretty bare bones, but hopefully it gave you a good overview into designing Slack bots and utilizing threads.
 
-I'd love feedback on this tutorial. You can file an issue, submit a PR, or [message me on GitHub](http://github.com/shanedewael).
+I'd love feedback on this tutorial. You can file an issue, submit a PR, or [message me on GitHub](http://github.com/shanedewael). Happy bot buidling 🤖🎉
 
 * [Section 00: Overview and Introduction](../README.md)
 * [Section 01: Setting up your Slack Bot](section-01.md)
