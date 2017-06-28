@@ -5,7 +5,7 @@ This tutorial walks through building Talkbot 🤖, an example application writte
 If you don't want to develop the app locally, you can
 
 [![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button.svg)](https://glitch.com/edit/#!/remix/talkbot)
-> 💡 *If you're going to use Glitch, you'll still have to go through the setup to generate tokens and connect the app to Firebase and Twilio. But instead of using an ngrok URL, you'll be able to use your Glitch one.*
+> 💡 *If you're going to use Glitch, you'll still have to go through the setup to generate tokens for your `.env` and connect the app to Firebase and Twilio. But instead of using an ngrok URL, you'll be able to use your Glitch URL.*
 
 Let's get started! 🎉👩‍💻
 
